@@ -3,12 +3,271 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "SDL/SDL_mixer.h"
-#include <stdlib.h>
 #include <stdio.h>
-#include <SDL/SDL.h>
-#include <SDL/SDL_image.h>
 #include "header.h"
+#include <time.h>
+ #include <unistd.h>
+#include <math.h>
+#include <SDL/SDL_ttf.h>
 
+void initialiser_pmap(pmap *pmap)
+{
+
+	pmap->afficher_pmap=NULL;
+	pmap->afficher_pmap=IMG_Load("pmap.png");
+
+	pmap->pos_pmap.x=100;
+	pmap->pos_pmap.y=120;
+
+
+	pmap->afficher_pperso=NULL;
+	pmap->afficher_pperso=IMG_Load("pperso.png");
+
+	pmap->pos_pperso.x=101;
+	pmap->pos_pperso.y=120;
+	pmap->nbmoved=0;
+
+
+}
+
+void afficher_pmap(pmap *pmap,SDL_Surface *ecran){
+
+
+	SDL_BlitSurface(pmap->afficher_pmap,NULL,ecran,&pmap->pos_pmap);
+
+	SDL_BlitSurface(pmap->afficher_pperso,NULL,ecran,&pmap->pos_pperso);
+
+		if (pmap->nbmoved==5){
+		pmap->pos_pperso.x+=10;
+		pmap->nbmoved=0;
+}
+	if (pmap->nbmoved==-5){
+		pmap->pos_pperso.x-=10;
+		pmap->nbmoved=0;
+	}
+
+}
+
+
+
+int collision_gauche_objet(SDL_Surface *s,SDL_Surface *masque,SDL_Rect *p ,stage *stage1)
+{
+    int x,y;
+  SDL_Color ca;
+  x=p->x+stage1->pos.x ;
+  y=p->y +s->h/2;
+  ca=GetPixel(masque,x,y);
+        if((ca.b==255)&&(ca.r==255)&&(ca.g==0))
+        {
+           return 1;
+        }
+        else
+        {
+          return 0 ;
+        }
+
+}
+int collision_droite(SDL_Surface *s,SDL_Surface *masque,SDL_Rect *p,stage *stage1 )
+{
+    int x,y;
+  SDL_Color ca;
+  x=p->x +s->w+stage1->pos.x;
+  y=p->y +s->h/2;
+  ca=GetPixel(masque,x,y);
+        if((ca.b==255)&&(ca.r==255)&&(ca.g==255))
+        {
+           return 1;
+        }
+        else
+        {
+          return 0 ;
+        }
+
+}
+int collision_gauche(SDL_Surface *s,SDL_Surface *masque,SDL_Rect *p ,stage *stage1)
+{
+    int x,y;
+  SDL_Color ca;
+  x=p->x+stage1->pos.x ;
+  y=p->y +s->h/2;
+  ca=GetPixel(masque,x,y);
+        if((ca.b==255)&&(ca.r==255)&&(ca.g==255))
+        {
+           return 1;
+        }
+        else
+        {
+          return 0 ;
+        }
+
+}
+ int collision_up(SDL_Surface *s,SDL_Surface *masque,SDL_Rect *p,stage *stage1 )
+{
+    int x,y;
+  SDL_Color ca;
+  x=p->x +s->w/2+stage1->pos.x;
+  y=p->y+s->h/2;
+  ca=GetPixel(masque,x,y);
+        if((ca.b==255)&&(ca.r==255)&&(ca.g==255))
+        {
+           return 1;
+        }
+        else
+        {
+          return 0 ;
+        }
+
+}
+int collision_gravite(SDL_Surface *s,SDL_Surface *masque,SDL_Rect *p,stage *stage1 )
+{
+    int x,y;
+  SDL_Color ca;
+  x=p->x +s->w/2+stage1->pos.x;
+  y=p->y +s->h;
+  ca=GetPixel(masque,x,y);
+        if((ca.b==255)&&(ca.r==255)&&(ca.g==255))
+        {
+           return 1;
+        }
+        else
+        {
+          return 0 ;
+        }
+
+}
+
+int sous_menu_ig(stage s)
+{
+int sousmenu=1;
+SDL_Event event;
+SDL_Surface *texte=NULL,*sprite1=NULL,*sprite2=NULL,*sprite3=NULL;
+TTF_Font *police = NULL;
+SDL_Color couleur = {255,255, 255};
+SDL_Rect textposition,positionsprite2,positionsprite1,positionsprite3;
+//position sprite& texte 
+textposition.x=230;
+textposition.y=210;
+positionsprite1.x=230;
+positionsprite1.y=140;
+positionsprite1.w =128;
+positionsprite1.h =26;
+positionsprite2.x=230;
+positionsprite2.y=260;
+positionsprite2.w =128;
+positionsprite2.h =26;
+positionsprite3.x=230;
+positionsprite3.y=200;
+positionsprite3.h=26;
+positionsprite3.w=128;
+SDL_Flip(s.ecran);
+charger_image("play.png",s.ecran,sprite1,&positionsprite1);
+charger_image("quit.png",s.ecran,sprite2,&positionsprite2);
+charger_image("save.png",s.ecran,sprite3,&positionsprite3);
+int mouse=0,keyboard=0;
+while(sousmenu){
+SDL_WaitEvent(&event);
+switch(event.type)
+        { 
+   case SDL_QUIT: sousmenu=0; break ;
+   case SDL_KEYDOWN:
+            switch (event.key.keysym.sym)
+             {case SDLK_UP:
+              keyboard++;
+              break;
+              case SDLK_DOWN:  
+              keyboard--;
+              break;
+              case SDLK_RETURN:
+if(keyboard==3){
+TTF_Quit();
+SDL_FreeSurface(texte); 
+SDL_FreeSurface(sprite1);
+SDL_FreeSurface(sprite2);
+sousmenu = 0;return 2;
+break;} 
+               
+              if(keyboard==2){
+TTF_Quit();
+SDL_FreeSurface(texte); 
+SDL_FreeSurface(sprite1);
+SDL_FreeSurface(sprite2);
+sousmenu=0;return -1;break;} 
+              if(keyboard==1){
+TTF_Quit();
+SDL_FreeSurface(texte); 
+SDL_FreeSurface(sprite1);
+SDL_FreeSurface(sprite2);
+sousmenu=0;
+return 1;break;}
+              break;
+              }}
+if(keyboard==1){charger_image("play2.png",s.ecran,sprite1,&positionsprite1);
+}else {charger_image("play.png",s.ecran,sprite1,&positionsprite1);}
+if(keyboard==3){charger_image("quit2.png",s.ecran,sprite2,&positionsprite2);}else {charger_image("quit.png",s.ecran,sprite2,&positionsprite2);}
+if(keyboard==2){charger_image("save2.png",s.ecran,sprite3,&positionsprite3);}else{charger_image("save.png",s.ecran,sprite3,&positionsprite3);}
+if(keyboard<1){keyboard=3; 
+TTF_Quit();
+SDL_FreeSurface(texte); 
+SDL_FreeSurface(sprite1);
+SDL_FreeSurface(sprite2);
+SDL_FreeSurface(sprite3);
+}
+if(keyboard>3){keyboard=1;
+TTF_Quit();
+SDL_FreeSurface(texte); 
+SDL_FreeSurface(sprite1);
+SDL_FreeSurface(sprite2);
+SDL_FreeSurface(sprite3);
+}
+} 
+TTF_Quit();
+SDL_FreeSurface(texte);
+}
+
+void SaveGame(personnage *p,ENNEMY *e,stage *s,FILE *f)
+ {
+int persox,persoy,stagex,stagey,monstrex,monstrey;
+persox=p->position.x;
+persoy=p->position.y;
+monstrex=e->x;
+monstrey=e->y;
+stagex=s->pos.x;
+stagey=s->pos.y;
+
+     f=fopen("/home/hbib/Desktop/TheGameSoFar/save.txt","w");
+     if (f==NULL)
+     {
+         printf("\nAn error has occured during your save.");
+     }
+     else
+     {
+     fprintf(f,"%d\n %d\n %d\n %d\n %d\n %d\n %d\n %d\n ",stagex,stagey,p->score,p->v.val,persox,persoy,monstrex,monstrey);
+
+    }
+ fclose(f);
+ }
+
+void LoadGame(personnage *p,ENNEMY *e ,stage *s,FILE *f)
+{
+int persox,persoy,stagex,stagey,monstrex,monstrey,vie,score;
+    f=fopen("/home/hbib/Desktop/TheGameSoFar/save.txt","r");
+    if (f==NULL){
+
+  printf ("\nAn error has occured during your load.");}
+ else
+     {
+fscanf(f,"%d\n %d\n %d\n %d\n %d\n %d\n %d\n %d\n ",&stagex,&stagey,&score,&vie,&persox,&persoy,&monstrex,&monstrey);
+    }
+fclose(f);
+p->position.x=persox;
+p->position.y=persoy;
+e->x=monstrex;
+e->y=monstrey;
+s->pos.x=stagex;
+s->pos.y=stagey;
+p->v.val=vie;
+p->score=score;
+}
 
 int Collission(SDL_Rect a,SDL_Rect b)
 {
@@ -27,8 +286,43 @@ int Collision(SDL_Rect box1,SDL_Rect box2)
           return 1;
 }
 
+int collision_parfaite(SDL_Surface *bg,int x,int y)
+{
+SDL_Color color;
 
-void anim_perso(int *i, SDL_Event *event,personnage *p){
+color=GetPixel(bg,x,y);
+
+if(color.r==255 && color.g==255 && color.b==255)
+return 1;
+if(color.r==255 && color.g==0 && color.b==0)
+return 3;
+if(color.r=255 && color.g==0 && color.b==255)
+return 2;
+
+return 0;
+}
+
+SDL_Color GetPixel(SDL_Surface *bg,int x,int y)
+{
+ SDL_Color color;
+Uint32 col=0;
+
+char* pPosition=(char*) bg->pixels;
+
+pPosition+=(bg->pitch*y);
+pPosition+=(bg->format->BytesPerPixel*x);
+
+memcpy(&col,pPosition,bg->format->BytesPerPixel);
+SDL_GetRGB(col,bg->format,&color.r,&color.g,&color.b);
+return (color);
+}
+
+
+
+
+
+void anim_perso(int *i, SDL_Event *event,personnage *p)
+{
 char lien[20];
 SDL_PollEvent(event);
                           switch(event->type)
@@ -609,7 +903,7 @@ SDL_Surface *initialiser_stage(stage *s,char chaine[])
   
 SDL_Surface *tmp=NULL,*image=NULL;
     tmp=IMG_Load(chaine);
-    SDL_SetColorKey(tmp,SDL_SRCCOLORKEY,SDL_MapRGB(tmp->format,255,255,255));
+    //SDL_SetColorKey(tmp,SDL_SRCCOLORKEY,SDL_MapRGB(tmp->format,255,255,255));
     image=SDL_DisplayFormat(tmp);
     SDL_FreeSurface(tmp);
     tmp=NULL;
@@ -639,9 +933,9 @@ SDL_BlitSurface(bg,pos,screen,NULL);
 }
 
 
-void Deplacement_personnage(SDL_Event *event,personnage *p,int *continuer,stage *s)
+int Deplacement_personnage(SDL_Event *event,personnage *p,int *continuer,stage *s,pmap *pmap)
 {
-int old_y;
+int what=0;	
 SDL_PollEvent(event);
      switch(event->type)
         {
@@ -652,11 +946,11 @@ SDL_PollEvent(event);
 if(event->button.button==SDL_BUTTON_LEFT)
    {
 if(event->button.x-s->pos.x>p->position.x-s->pos.x)
-{
+{if(collision_droite(p->sprite,s->mask,&p->position,s)!=1)
 p->position.x+=p->vitesse+p->acceleration*0.2;}
 
 if(event->button.x-s->pos.x<p->position.x-s->pos.x)
-{
+{if(collision_gauche(p->sprite,s->mask,&p->position,s)!=1)
 p->position.x-=p->vitesse+p->acceleration*0.2;}
 
 
@@ -665,29 +959,69 @@ break;
  case SDL_KEYDOWN:
                 switch(event->key.keysym.sym)
                 {
+                    case SDLK_ESCAPE : 
+what=sous_menu_ig(*s);
+break;
                     case SDLK_UP: 
-p->position.y-=p->vitesse/6;
+if(collision_up(p->sprite,s->mask,&p->position,s)!=1)
+{p->position.y-=p->vitesse/6;
+
+}
                         break;
                     case SDLK_DOWN: 
+if(collision_gravite(p->sprite,s->mask,&p->position,s)!=1)
 p->position.y+=p->vitesse/6;
 
                         break;
                     case SDLK_RIGHT: 
+if(collision_droite(p->sprite,s->mask,&p->position,s)!=1)
+{
+pmap->nbmoved++;
 p->position.x+=p->vitesse+p->acceleration*0.2;
+s->camera.x+=p->vitesse+p->acceleration*0.2;
+if(s->camera.x>s->background->w-s->ecran->w)
+s->camera.x=s->background->w-s->ecran->w;
+}
                         break;
-                    case SDLK_LEFT: 
+                    case SDLK_LEFT:
+if(collision_gauche(p->sprite,s->mask,&p->position,s)!=1) 
+{
+pmap->nbmoved--;
 p->position.x-=p->vitesse+p->acceleration*0.2;
-                        break;
+s->camera.x-=p->vitesse+p->acceleration*0.2;
+if(s->camera.x<0)
+s->camera.x=0;
+}
+                       break;
                 }
-                break;
-             }
-       
+               
+break;
+   }
+return what;
 }
 
+void scroll_cam(personnage p,stage *s)
+{
+if(p.position.x>400)
+s->camera.x+=100;
+if(p.position.x<100)
+s->camera.x-=100; 
+
+
+
+  if(s->camera.x<=0)
+   s->camera.x=0;
+  if(s->camera.y<0)
+   s->camera.y=0;
+  if(s->camera.x>4700-s->camera.w)
+   s->camera.x=4700-s->camera.w;
+  if(s->camera.y>430-s->camera.h)
+  s->camera.y=430-s->camera.w;
+
+}
 
 void scrolling(personnage *p,stage *stage1)
 {      
-
 if((p->position.x>=450)&&(stage1->pos.x<=(4730-558)))
        {
          stage1->pos.x+=20;
@@ -695,11 +1029,11 @@ if((p->position.x>=450)&&(stage1->pos.x<=(4730-558)))
          p->position.x=430;
          p->v.o.positionObjet.x+=0.1;
        }
- if((p->position.x<=50)&&(stage1->pos.x>=0))
+ if((p->position.x<=70)&&(stage1->pos.x>=0))
              {
          stage1->pos.x-=20;
          monstre.x+=20;
-         p->position.x=70;
+         p->position.x=90;
          p->v.o.positionObjet.x-=0.1;
              }
 
